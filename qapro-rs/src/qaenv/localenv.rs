@@ -2,23 +2,32 @@ use lazy_static::lazy_static;
 use log::debug;
 use std::path::Path;
 use std::{env, fs};
-
+use clap::{Arg, Command};
 use serde_derive::*;
 use toml;
 
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 
 /// Defines and parses CLI argument for this server.
-pub fn parse_cli_args<'a>() -> clap::ArgMatches<'a> {
-    clap::App::new("qaruntime-rs")
+pub fn parse_cli_args<'a>() -> clap::ArgMatches {
+    // clap::App::new("qaruntime-rs")
+    //     .version(VERSION)
+    //     .arg(
+    //         clap::Arg::with_name("config")
+    //             .required(false)
+    //             .help("Path to configuration file")
+    //             .index(1),
+    //     )
+    //     .get_matches()
+
+    Command::new("qaruntime-rs")
         .version(VERSION)
-        .arg(
-            clap::Arg::with_name("config")
-                .required(false)
-                .help("Path to configuration file")
-                .index(1),
-        )
-        .get_matches()
+        .arg(Arg::new("config")
+            .required(false)
+            .help("Path to configuration file")
+            .index(1)
+            )
+        .get_matches() // builds the instance of ArgMatches
 }
 
 /// Parses CLI arguments, finds location of config file, and parses config file into a struct.

@@ -1,17 +1,16 @@
 use crate::qaenv::localenv::CONFIG;
 
-use polars::prelude::{
-    CsvReader, DataFrame, DataType, Field, NamedFrom, ParquetReader, ParquetWriter,
-    Result as PolarResult, RollingOptions, Schema, SerReader, Series,
-};
+use polars::prelude::{CsvReader, DataFrame, DataType, Field, NamedFrom, ParquetReader, ParquetWriter, Schema, SerReader, Series, SortMultipleOptions};
 use std::fs::File;
 
 fn QADataStruct_StockAdj_schema() -> Schema {
-    Schema::new(vec![
-        Field::new("date", DataType::Utf8),
-        Field::new("order_book_id", DataType::Utf8),
-        Field::new("adj", DataType::Float32),
-    ])
+    Schema::new(
+    // vec![
+    //     Field::new("date", DataType::Utf8),
+    //     Field::new("order_book_id", DataType::Utf8),
+    //     Field::new("adj", DataType::Float32),
+    // ]
+    )
 }
 pub struct QADataStruct_StockAdj {
     pub data: DataFrame,
@@ -27,7 +26,7 @@ impl QADataStruct_StockAdj {
         let df = DataFrame::new(vec![dateS, order_book_idS, adjS]).unwrap();
         Self {
             data: df
-                .sort(&["date", "order_book_id"], vec![false, false])
+                .sort(&["date", "order_book_id"], SortMultipleOptions::new().with_order_descending_multi([false, false]))
                 .unwrap(),
             name: "stockadj".to_string(),
         }
@@ -45,6 +44,6 @@ impl QADataStruct_StockAdj {
         let cachepath = format!("{}stockadj.parquet", &CONFIG.DataPath.cache);
         let file = File::create(cachepath).expect("could not create file");
 
-        ParquetWriter::new(file).finish(&self.data);
+        ParquetWriter::new(file).finish(&mut self.data);
     }
 }

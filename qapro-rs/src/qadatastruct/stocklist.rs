@@ -1,17 +1,19 @@
 use polars::prelude::{
-    CsvReader, DataFrame, DataType, Field, NamedFrom, ParquetReader, Result as PolarResult,
-    RollingOptions, Schema, SerReader, Series,
+    CsvReader, DataFrame, DataType, Field, NamedFrom, ParquetReader,
+    Schema, SerReader, Series,
 };
 
 ///┌─order_book_id─┬─industry_code─┬─market_tplus─┬─symbol─┬─special_type─┬─exchange─┬─status─┬─type─┬─de_listed_date─┬─listed_date─┬─sector_code_name─┬─abbrev_symbol─┬─sector_code─┬─round_lot─┬─trading_hours───────────┬─board_type─┬─industry_name────────┬─issue_price─┬─trading_code─┬─purchasedate─┐
 
 fn QADataStruct_StockAdj_schema() -> Schema {
-    Schema::new(vec![
-        Field::new("order_book_id", DataType::Utf8),
-        Field::new("listed_date", DataType::Utf8),
-        Field::new("de_listed_date", DataType::Utf8),
-        Field::new("symbol", DataType::Utf8),
-    ])
+    Schema::new(
+    // vec![
+    //     Field::new("order_book_id", DataType::Utf8),
+    //     Field::new("listed_date", DataType::Utf8),
+    //     Field::new("de_listed_date", DataType::Utf8),
+    //     Field::new("symbol", DataType::Utf8),
+    // ]
+    )
 }
 pub struct QADataStruct_StockList {
     pub data: DataFrame,

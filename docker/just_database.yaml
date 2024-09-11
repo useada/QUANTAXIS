@@ -20,7 +20,7 @@ services:
             - TZ=Asia/Shanghai
             - MONGO_INITDB_DATABASE=quantaxis
         volumes:
-            - qamg:/data/db
+            - qadb:/data/db
         networks:
             qanetwork_db:
                 ipv4_address: 172.19.11.3
@@ -51,11 +51,11 @@ services:
                 ipv4_address: 172.19.11.5
         restart: always
 
-
+# docker volume create --name=qadb
 volumes:
-    qamg:
+    qadb:
         external:
-            name: qamg
+            name: qadb
 
 networks:
     qanetwork_db:

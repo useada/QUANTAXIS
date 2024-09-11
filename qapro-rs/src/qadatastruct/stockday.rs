@@ -1,6 +1,7 @@
 use polars::prelude::{
     ChunkCompare, CsvReader, DataFrame, DataType, Field, NamedFrom, ParquetCompression,
-    ParquetReader, ParquetWriter, Result as PolarResult, RollingOptions, Schema, SerReader, Series,
+    ParquetReader, ParquetWriter, RollingOptionsFixedWindow, Schema, SerReader, Series,
+    SortMultipleOptions,
 };
 
 use polars::series::ops::NullBehavior;
@@ -16,29 +17,31 @@ pub struct QADataStruct_StockDay {
 }
 
 fn QADataStruct_StockDay_schema() -> Schema {
-    Schema::new(vec![
-        Field::new("date", DataType::Utf8),
-        Field::new("code", DataType::Utf8),
-        Field::new("order_book_id", DataType::Utf8),
-        Field::new("num_trades", DataType::Float32),
-        Field::new("limit_up", DataType::Float32),
-        Field::new("limit_down", DataType::Float32),
-        Field::new("open", DataType::Float32),
-        Field::new("high", DataType::Float32),
-        Field::new("low", DataType::Float32),
-        Field::new("close", DataType::Float32),
-        Field::new("volume", DataType::Float32),
-        Field::new("total_turnover", DataType::Float32),
-        Field::new("amount", DataType::Float32),
-    ])
+    Schema::new(
+    // vec![
+    //     Field::new("date", DataType::String),
+    //     Field::new("code", DataType::String),
+    //     Field::new("order_book_id", DataType::String),
+    //     Field::new("num_trades", DataType::Float32),
+    //     Field::new("limit_up", DataType::Float32),
+    //     Field::new("limit_down", DataType::Float32),
+    //     Field::new("open", DataType::Float32),
+    //     Field::new("high", DataType::Float32),
+    //     Field::new("low", DataType::Float32),
+    //     Field::new("close", DataType::Float32),
+    //     Field::new("volume", DataType::Float32),
+    //     Field::new("total_turnover", DataType::Float32),
+    //     Field::new("amount", DataType::Float32),
+    // ]
+    )
 }
 impl QADataStruct_StockDay {
     pub fn new_from_csv(path: &str) -> Self {
         let schema = QADataStruct_StockDay_schema();
         let file = File::open(path).expect("Cannot open file.");
         let df = CsvReader::new(file)
-            .with_schema(&Arc::new(schema))
-            .has_header(true)
+            // .with_schema(&Arc::new(schema))
+            // .has_header(true)
             .finish()
             .unwrap();
         Self { data: df }
@@ -91,7 +94,7 @@ impl QADataStruct_StockDay {
         .unwrap();
         Self {
             data: df
-                .sort(&["date", "order_book_id"], vec![false, false])
+                .sort(&["date", "order_book_id"], SortMultipleOptions::new().with_order_descending_multi([false, false]))
                 .unwrap(),
         }
     }
@@ -103,13 +106,13 @@ impl QADataStruct_StockDay {
 
     pub fn query_code(&mut self, order_book_id: &str) -> DataFrame {
         let value = self.data.column("order_book_id").unwrap();
-        let mask = value.equal(order_book_id);
+        let mask = value.equal(order_book_id).unwrap();
         let selectdf = &self.data.filter(&mask).unwrap();
         selectdf.to_owned()
     }
     pub fn query_date(&mut self, date: &str) -> DataFrame {
         let value = self.data.column("date").unwrap();
-        let mask = value.equal(date);
+        let mask = value.equal(date).unwrap();
         let selectdf = &self.data.filter(&mask).unwrap();
         selectdf.to_owned()
     }
@@ -128,18 +131,19 @@ impl QADataStruct_StockDay {
         let cache = &CONFIG.DataPath.cache;
         let cachepath = format!("{}stockday.parquet", &CONFIG.DataPath.cache);
         let file = File::create(cachepath).expect("could not create file");
-        ParquetWriter::new(file).finish(&self.data);
+        ParquetWriter::new(file).finish(&mut self.data);
     }
 
     pub fn save_selfdefined_cache(&mut self, path: &str) {
         //let cache = &CONFIG.DataPath.cache;
         // let cachepath = format!("{}stockday.parquet", &CONFIG.DataPath.cache);
         let file = File::create(path).expect("could not create file");
-        ParquetWriter::new(file).finish(&self.data);
+        ParquetWriter::new(file).finish(&mut self.data);
     }
 }
 #[cfg(test)]
 mod test {
+    use polars::prelude::SeriesOpsTime;
     use super::*;
 
     #[test]
@@ -151,17 +155,18 @@ mod test {
         let low = &sd.data["low"];
 
         let calc = high - low;
-        println!("Final Series high - low :\n{}", calc);
+        println!("Final Series high - low :\n{:?}", calc);
 
         println!("High diff:\n{}", high.diff(2, NullBehavior::Drop));
 
         println!(
             "High rollingstd:\n{}",
-            high.rolling_std(RollingOptions {
+            high.rolling_std(RollingOptionsFixedWindow {
                 window_size: 3,
                 min_periods: 1,
                 weights: None,
-                center: false
+                center: false,
+                fn_params: None,
             })
             .unwrap()
         );

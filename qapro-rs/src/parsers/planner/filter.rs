@@ -27,7 +27,7 @@ impl Filter {
 
     pub fn expand_fullpath(self, env: &Env) -> Self {
         match self.0 {
-            Some(box cond) => Self(Some(Box::new(cond.expand_fullpath(env)))),
+            Some(cond) => Self(Some(Box::new(cond.expand_fullpath(env)))),
             None => Self(None),
         }
     }

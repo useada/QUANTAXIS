@@ -15,6 +15,7 @@ pub use mongodb::{
     },
     sync::{Client, Collection},
 };
+use futures::stream::{StreamExt, TryStreamExt};
 
 use serde::Serialize;
 
@@ -41,13 +42,12 @@ impl QAMongoClient {
         Self { client }
     }
     pub async fn get_qifi(&self, account_cookie: String) -> QIFI {
-        let coll = self
+        let coll: Collection<QIFI> = self
             .client
             .database(CONFIG.account.db.as_str())
             .collection("account");
         let cursor = coll
-            .find_one(doc! {"account_cookie": &account_cookie}, None)
-            .expect("Failed to execute find.");
+            .find_one(doc! {"account_cookie": &account_cookie}).await;
         let serialized = serde_json::to_string(&cursor.unwrap()).unwrap();
         // 转换为Value
         let x = from_string(serialized).unwrap();
@@ -63,27 +63,25 @@ impl QAMongoClient {
     }
 
     pub async fn get_accountlist(&self) -> Vec<String> {
-        let coll = self
+        let coll: Collection<String> = self
             .client
             .database(CONFIG.account.db.as_str())
             .collection("account");
+        // FindOptions::builder()
+        //     .batch_size(Option::from(10000000))
+        //     .projection(Option::from(doc! {"account_cookie": 1}))
+        //     .build(),
         let mut cursor = coll
-            .find(
-                None,
-                FindOptions::builder()
-                    .batch_size(Option::from(10000000))
-                    .projection(Option::from(doc! {"account_cookie": 1}))
-                    .build(),
-            )
-            .expect("Failed to execute find.");
+            .find(doc! {}).projection(doc! {"account_cookie": 1}).await.unwrap();
 
         let mut u: Vec<String> = Vec::new();
-        while let Some(result) = cursor.next() {
+        while let Some(result) = cursor.next().await {
             match result {
                 Ok(document) => {
-                    if let Some(title) = document.get("account_cookie").and_then(Bson::as_str) {
-                        u.push(title.to_string());
-                    }
+                    // if let Some(title) = document.get("account_cookie").and_then(Bson::as_str) {
+                    //     u.push(title.to_string());
+                    // }
+                    u.push(document);
                 }
                 Err(e) => {}
             }
@@ -99,7 +97,7 @@ impl QAMongoClient {
 
     pub async fn save_qifi_slice(&self, mut slice: QIFI) {
         slice.updatetime = Local::now().format("%Y-%m-%d %H:%M:%S").to_string();
-        let coll = self
+        let coll: Collection<QIFI> = self
             .client
             .database(CONFIG.account.db.as_str())
             .collection("account");
@@ -108,12 +106,12 @@ impl QAMongoClient {
         coll.update_one(
             doc! {"account_cookie": slice.account_cookie},
             v,
-            UpdateOptions::builder().upsert(Option::from(true)).build(),
-        ).unwrap();
+            // UpdateOptions::builder().upsert(Option::from(true)).build(),
+        ).await.expect("TODO: panic message");
     }
 
     pub async fn save_his_qifi_slice(&self, slice: QIFI) {
-        let coll = self
+        let coll: Collection<QIFI> = self
             .client
             .database(CONFIG.account.db.as_str())
             .collection("history");
@@ -122,14 +120,14 @@ impl QAMongoClient {
         coll.update_one(
             doc! {"account_cookie": slice.account_cookie,"trading_day":trading_day},
             v,
-            UpdateOptions::builder().upsert(Option::from(true)).build(),
-        ).unwrap();
+            // UpdateOptions::builder().upsert(Option::from(true)).build(),
+        ).await.expect("TODO: panic message");
     }
 
     pub async fn save_accounthis(&self, mut account: QA_Account) {
         let slice: QIFI = account.get_qifi_slice();
 
-        let coll = self
+        let coll: Collection<QA_Account> = self
             .client
             .database(CONFIG.account.db.as_str())
             .collection("history");
@@ -138,7 +136,7 @@ impl QAMongoClient {
         coll.update_one(
             doc! {"account_cookie": slice.account_cookie,"trading_day":trading_day},
             v,
-            UpdateOptions::builder().upsert(Option::from(true)).build(),
-        ).unwrap();
+            // UpdateOptions::builder().upsert(Option::from(true)).build(),
+        ).await.expect("TODO: panic message");
     }
 }

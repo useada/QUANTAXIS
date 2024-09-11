@@ -7,6 +7,7 @@ use std::io::Error;
 use async_trait::async_trait;
 use chrono;
 use clickhouse_rs::Pool;
+use futures::Future;
 
 use crate::qadatastruct::factorstruct::QADataStruct_Factor;
 use crate::qadatastruct::stockadj::QADataStruct_StockAdj;

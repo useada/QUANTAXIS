@@ -1,14 +1,13 @@
-use polars::prelude::{
-    CsvReader, DataFrame, DataType, Field, NamedFrom, ParquetReader, Result as PolarResult,
-    RollingOptions, Schema, SerReader, Series,
-};
+use polars::prelude::{CsvReader, DataFrame, DataType, Field, NamedFrom, ParquetReader, Schema, SerReader, Series, SortMultipleOptions};
 
 fn QADataStruct_Factor_schema() -> Schema {
-    Schema::new(vec![
-        Field::new("date", DataType::Utf8),
-        Field::new("order_book_id", DataType::Utf8),
-        Field::new("factor", DataType::Float32),
-    ])
+    Schema::new(
+    // vec![
+    //     Field::new("date", DataType::Utf8),
+    //     Field::new("order_book_id", DataType::Utf8),
+    //     Field::new("factor", DataType::Float32),
+    // ]
+    )
 }
 
 // same with python model :: // qafactor Daily struct
@@ -31,7 +30,7 @@ impl QADataStruct_Factor {
         let df = DataFrame::new(vec![dateS, order_book_idS, factorS]).unwrap();
         Self {
             data: df
-                .sort(&["date", "order_book_id"], vec![false, false])
+                .sort(&["date", "order_book_id"], SortMultipleOptions::default().with_order_descending_multi(&[false, false]))
                 .unwrap(),
             name: factorname,
         }

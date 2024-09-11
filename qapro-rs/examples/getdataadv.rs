@@ -7,7 +7,7 @@ use qapro_rs::qaenv::localenv::CONFIG;
 use qapro_rs::qalog::log4::init_log4;
 use qapro_rs::qaprotocol::mifi::qafastkline::QAKlineBase;
 
-use polars::prelude::{ChunkCompare, RollingOptions};
+use polars::prelude::{ChunkCompare, RollingOptionsFixedWindow, SeriesOpsTime};
 use polars::series::ops::NullBehavior;
 use std::fmt::format;
 
@@ -44,12 +44,12 @@ async fn main() {
 
     println!(
         "groupby test {:#?}",
-        data.data.groupby(["date"]).unwrap().select(["close"]).mean()
+        data.data.group_by(["date"]).unwrap().select(["close"]).mean()
     );
     println!(
         "groupby test {:#?}",
         data.data
-            .groupby(["order_book_id"])
+            .group_by(["order_book_id"])
             .unwrap()
             .select(["close"])
             .mean()
@@ -67,11 +67,12 @@ async fn main() {
     println!("pct test {:#?}", close / &lastclose);
 
     let ma20 = close
-        .rolling_mean(RollingOptions {
+        .rolling_mean( RollingOptionsFixedWindow {
             window_size: 5,
             min_periods: 1,
             weights: None,
             center: false,
+            fn_params: None,
         })
         .unwrap();
     println!("rolling mean test {:#?}", ma20);

@@ -5,8 +5,8 @@ use qapro_rs::qaconnector::clickhouse::ckclient::DataConnector;
 use qapro_rs::qadatastruct::stockday::QADataStruct_StockDay;
 use qapro_rs::qaenv::localenv::CONFIG;
 
-use polars::frame::DataFrame;
-use polars::prelude::{col, ChunkCompare, IntoLazy, JoinType, RollingOptions};
+use polars::frame::{DataFrame, UniqueKeepStrategy};
+use polars::prelude::{col, ChunkCompare, DataFrameJoinOps, IntoLazy, JoinArgs, JoinType,};
 use polars::series::ops::NullBehavior;
 use qapro_rs::qadatastruct::stockadj::QADataStruct_StockAdj;
 
@@ -45,8 +45,7 @@ async fn main() {
             &adj.data,
             &["date", "order_book_id"],
             &["date", "order_book_id"],
-            JoinType::Inner,
-            None,
+            JoinArgs::from(JoinType::Inner),
         )
         .unwrap();
     //println!("join data {:#?}", joindata);
@@ -61,9 +60,10 @@ async fn main() {
             col("limit_up") * col("adj"),
             col("limit_down") * col("adj"),
         ])
-        .drop_duplicates(
-            false,
-            Some(vec!["date".to_string(), "order_book_id".to_string()]),
+        .unique(
+            Some(&["date".to_string(), "order_book_id".to_string()]),
+            UniqueKeepStrategy::First,
+            None,
         )
         .collect()
         .unwrap();

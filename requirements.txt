@@ -42,3 +42,6 @@ alphalens
 qanotify
 
 pyarrow>=6.0.1
+
+#conda install -c conda-forge ta-lib
+zipline-reloaded

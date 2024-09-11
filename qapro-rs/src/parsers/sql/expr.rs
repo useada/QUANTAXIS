@@ -140,12 +140,12 @@ impl Expr {
             Self::Star => todo!(),
             Self::Func(_) => todo!(),
             Self::Sql(_) => todo!(),
-            Self::Add(box expr1, box expr2) => (expr1).eval(&env) + (expr2).eval(&env),
-            Self::Sub(box expr1, box expr2) => (expr1).eval(&env) - (expr2).eval(&env),
-            Self::Mul(box expr1, box expr2) => (expr1).eval(&env) * (expr2).eval(&env),
-            Self::Div(box expr1, box expr2) => (expr1).eval(&env) / (expr2).eval(&env),
-            Self::Rem(box expr1, box expr2) => (expr1).eval(&env) % (expr2).eval(&env),
-            Self::Exp(box expr1, box expr2) => (expr1).eval(&env).powf((expr2).eval(&env)),
+            Self::Add(expr1, expr2) => (expr1).eval(&env) + (expr2).eval(&env),
+            Self::Sub(expr1, expr2) => (expr1).eval(&env) - (expr2).eval(&env),
+            Self::Mul(expr1, expr2) => (expr1).eval(&env) * (expr2).eval(&env),
+            Self::Div(expr1, expr2) => (expr1).eval(&env) / (expr2).eval(&env),
+            Self::Rem(expr1, expr2) => (expr1).eval(&env) % (expr2).eval(&env),
+            Self::Exp(expr1, expr2) => (expr1).eval(&env).powf((expr2).eval(&env)),
         }
     }
 
@@ -157,32 +157,32 @@ impl Expr {
                     selector.expand_fullpath2(&env).to_string()
                 }
             }
-            Expr::Add(box expr1, box expr2) => {
+            Expr::Add(expr1, expr2) => {
                 let a = expr1.source_field_name_set(&env);
                 let b = expr2.source_field_name_set(&env);
                 a.union(&b).map(String::from).collect::<HashSet<_>>()
             }
-            Expr::Sub(box expr1, box expr2) => {
+            Expr::Sub(expr1, expr2) => {
                 let a = expr1.source_field_name_set(&env);
                 let b = expr2.source_field_name_set(&env);
                 a.union(&b).map(String::from).collect::<HashSet<_>>()
             }
-            Expr::Mul(box expr1, box expr2) => {
+            Expr::Mul(expr1, expr2) => {
                 let a = expr1.source_field_name_set(&env);
                 let b = expr2.source_field_name_set(&env);
                 a.union(&b).map(String::from).collect::<HashSet<_>>()
             }
-            Expr::Div(box expr1, box expr2) => {
+            Expr::Div(expr1, expr2) => {
                 let a = expr1.source_field_name_set(&env);
                 let b = expr2.source_field_name_set(&env);
                 a.union(&b).map(String::from).collect::<HashSet<_>>()
             }
-            Expr::Rem(box expr1, box expr2) => {
+            Expr::Rem(expr1, expr2) => {
                 let a = expr1.source_field_name_set(&env);
                 let b = expr2.source_field_name_set(&env);
                 a.union(&b).map(String::from).collect::<HashSet<_>>()
             }
-            Expr::Exp(box expr1, box expr2) => {
+            Expr::Exp(expr1, expr2) => {
                 let a = expr1.source_field_name_set(&env);
                 let b = expr2.source_field_name_set(&env);
                 a.union(&b).map(String::from).collect::<HashSet<_>>()
@@ -201,37 +201,37 @@ impl Expr {
             Self::Star => todo!(),
             Self::Func(_) => todo!(),
             Self::Sql(_) => todo!(),
-            Self::Add(box expr1, box expr2) => match (expr1.to_path(), expr2.to_path()) {
+            Self::Add(expr1, expr2) => match (expr1.to_path(), expr2.to_path()) {
                 (Some(s1), Some(s2)) => Some(s1.intersect(&s2)),
                 (Some(s1), _) => Some(s1),
                 (_, Some(s2)) => Some(s2),
                 _ => None,
             },
-            Self::Sub(box expr1, box expr2) => match (expr1.to_path(), expr2.to_path()) {
+            Self::Sub(expr1, expr2) => match (expr1.to_path(), expr2.to_path()) {
                 (Some(s1), Some(s2)) => Some(s1.intersect(&s2)),
                 (Some(s1), _) => Some(s1),
                 (_, Some(s2)) => Some(s2),
                 _ => None,
             },
-            Self::Mul(box expr1, box expr2) => match (expr1.to_path(), expr2.to_path()) {
+            Self::Mul(expr1, expr2) => match (expr1.to_path(), expr2.to_path()) {
                 (Some(s1), Some(s2)) => Some(s1.intersect(&s2)),
                 (Some(s1), _) => Some(s1),
                 (_, Some(s2)) => Some(s2),
                 _ => None,
             },
-            Self::Div(box expr1, box expr2) => match (expr1.to_path(), expr2.to_path()) {
+            Self::Div(expr1, expr2) => match (expr1.to_path(), expr2.to_path()) {
                 (Some(s1), Some(s2)) => Some(s1.intersect(&s2)),
                 (Some(s1), _) => Some(s1),
                 (_, Some(s2)) => Some(s2),
                 _ => None,
             },
-            Self::Rem(box expr1, box expr2) => match (expr1.to_path(), expr2.to_path()) {
+            Self::Rem(expr1, expr2) => match (expr1.to_path(), expr2.to_path()) {
                 (Some(s1), Some(s2)) => Some(s1.intersect(&s2)),
                 (Some(s1), _) => Some(s1),
                 (_, Some(s2)) => Some(s2),
                 _ => None,
             },
-            Self::Exp(box expr1, box expr2) => match (expr1.to_path(), expr2.to_path()) {
+            Self::Exp(expr1, expr2) => match (expr1.to_path(), expr2.to_path()) {
                 (Some(s1), Some(s2)) => Some(s1.intersect(&s2)),
                 (Some(s1), _) => Some(s1),
                 (_, Some(s2)) => Some(s2),

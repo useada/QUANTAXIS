@@ -16,8 +16,8 @@ import QUANTAXIS as QA
 
 from QUANTAXIS.QAEngine.QAThreadEngine import QA_Thread
 from QUANTAXIS.QAUtil.QAParameter import MARKET_TYPE, RUNNING_ENVIRONMENT, ORDER_DIRECTION
-from QAPUBSUB.consumer import subscriber_topic,  subscriber_routing
-from QAPUBSUB.producer import publisher_routing
+from QUANTAXIS.QAPubSub.consumer import subscriber_topic,  subscriber_routing
+from QUANTAXIS.QAPubSub.producer import publisher_routing
 from QUANTAXIS.QAStrategy.qactabase import QAStrategyCtaBase
 from QUANTAXIS.QIFI.QifiAccount import QIFI_Account
 
@@ -151,6 +151,10 @@ class QAStrategyStockBase(QAStrategyCtaBase):
         # print(self.acc)
 
         # print(self.acc.market_type)
+
+        self.acc = QIFI_Account(
+            username=self.strategy_id, password=self.strategy_id, trade_host=mongo_ip)
+        self.acc.initial()
         data = QA.QA_quotation(self.code, self.start, self.end, source=QA.DATASOURCE.MONGO,
                                frequence=self.frequence, market=self.market_type, output=QA.OUTPUT_FORMAT.DATASTRUCT)
 

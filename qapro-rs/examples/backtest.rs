@@ -26,12 +26,12 @@ async fn main() {
     sw.restart();
     let rank4 = qfq
         .data
-        .sort(["date"], false)
+        .sort(["date"], SortMultipleOptions::default().with_order_descending(true))
         .unwrap()
         .lazy()
-        .groupby([col("order_book_id")])
+        .group_by([col("order_book_id")])
         .agg([
-            col("close").pct_change(1).alias("pct"),
+            col("close").pct_change(lit(1)).alias("pct"),
             col("date"),
             col("close"),
             col("open"),
@@ -63,8 +63,8 @@ async fn main() {
     println!("lazy res {:#?}", rank4);
 
     let closes = rank4["close"].f32().unwrap();
-    let codes = rank4["order_book_id"].utf8().unwrap();
-    let dates = rank4["date"].utf8().unwrap();
+    let codes = rank4["order_book_id"].str().unwrap();
+    let dates = rank4["date"].str().unwrap();
 
     let mut acc = QA_Account::new("test", "test", "test", 1000000000.0, false, "backtest");
     let mut curdate = "";

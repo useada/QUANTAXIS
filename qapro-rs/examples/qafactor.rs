@@ -7,7 +7,7 @@ use qapro_rs::qaenv::localenv::CONFIG;
 use qapro_rs::qalog::log4::init_log4;
 use qapro_rs::qaprotocol::mifi::qafastkline::QAKlineBase;
 
-use polars::prelude::{ChunkCompare, RollingOptions};
+use polars::prelude::{ChunkCompare};
 use polars::series::ops::NullBehavior;
 use std::fmt::format;
 

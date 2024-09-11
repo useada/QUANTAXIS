@@ -59,13 +59,13 @@ async fn main() {
             &factor.data,
             &["date", "order_book_id"],
             &["date", "order_book_id"],
-            JoinType::Inner,
-            None,
+            JoinArgs::new(JoinType::Inner),
         )
         .unwrap()
-        .drop_duplicates(
-            false,
+        .unique(
             Some(&["date".to_string(), "order_book_id".to_string()]),
+            UniqueKeepStrategy::First,
+            None,
         )
         .unwrap();
     println!("join factor_data time {:#?}", sw.elapsed());
@@ -73,29 +73,30 @@ async fn main() {
 
     sw.restart();
     let rank = data_with_factor
-        .groupby(["date"])
+        .group_by(["date"])
         .unwrap()
-        .apply(|x| Ok(x.sort(["factor"], true).unwrap().head(Some(40))))
+        .apply(|x| Ok(x.sort(["factor"], SortMultipleOptions::default().with_order_descending(true))
+        .unwrap().head(Some(40))))
         .unwrap()
-        .sort(["date", "order_book_id"], false)
+        .sort(["date", "order_book_id"], SortMultipleOptions::default().with_order_descending(false))
         .unwrap();
 
     println!("analysis factor_data time {:#?}", sw.elapsed());
-    fn write_result(data: DataFrame, path: &str) {
+    fn write_result(mut data: DataFrame, path: &str) {
         let file = File::create(path).expect("could not create file");
 
-        ParquetWriter::new(file).finish(&data);
+        ParquetWriter::new(file).finish(&mut data);
     }
 
     sw.restart();
 
     let rank4 = rank
-        .sort(["date"], false)
+        .sort(["date"], SortMultipleOptions::default().with_order_descending(false))
         .unwrap()
         .lazy()
-        .groupby([col("order_book_id")])
+        .group_by([col("order_book_id")])
         .agg([
-            col("close").pct_change(1).alias("pct"),
+            col("close").pct_change(lit(1)).alias("pct"),
             col("date"),
             col("close"),
             col("open"),
@@ -122,7 +123,7 @@ async fn main() {
             col("limit_down"),
             col("pct"),
         ])
-        .sort("date", false)
+        .sort("date", SortMultipleOptions::default().with_order_descending(false))
         .collect()
         .unwrap();
 
@@ -130,8 +131,8 @@ async fn main() {
     println!("lazy res {:#?}", rank4);
 
     let closes = rank4["close"].f32().unwrap();
-    let codes = rank4["order_book_id"].utf8().unwrap();
-    let dates = rank4["date"].utf8().unwrap();
+    let codes = rank4["order_book_id"].str().unwrap();
+    let dates = rank4["date"].str().unwrap();
     sw.restart();
 
     let mut acc = QA_Account::new("test2", "test", "test", 1000000000.0, false, "backtest");
