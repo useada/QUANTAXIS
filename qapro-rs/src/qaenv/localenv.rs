@@ -5,6 +5,8 @@ use std::{env, fs};
 use clap::{Arg, Command};
 use serde_derive::*;
 use toml;
+// use crate::parsers::sql::SelectorNode::String;
+use std::string::String;
 
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 
@@ -32,7 +34,8 @@ pub fn parse_cli_args<'a>() -> clap::ArgMatches {
 
 /// Parses CLI arguments, finds location of config file, and parses config file into a struct.
 pub fn parse_config_from_cli_args(matches: &clap::ArgMatches) -> Config {
-    let conf = match matches.value_of("config") {
+    // let conf = match matches.value_of("config") {
+    let conf = match matches.get_one::<std::string::String>("config") {
         Some(config_path) => match Config::from_file(config_path) {
             Ok(config) => config,
             Err(msg) => {

@@ -18,7 +18,7 @@ use crate::qaenv::localenv::CONFIG;
 
 use crate::qaprotocol::mifi::qafastkline::QAColumnBar;
 
-type ServerDate = chrono::Date<Tz>;
+type ServerDate = chrono::NaiveDate;
 type ServerDateTime = chrono::DateTime<Tz>;
 
 macro_rules! get {
@@ -205,7 +205,7 @@ impl DataConnector for QACKClient {
 
         let mut ttimevec: Vec<String> = vec![];
         if freq == "day" {
-            let timevec: Vec<_> = result.get_column("date")?.iter::<Date<Tz>>()?.collect();
+            let timevec: Vec<_> = result.get_column("date")?.iter::<NaiveDate>()?.collect();
 
             ttimevec = timevec
                 .iter()
@@ -284,7 +284,7 @@ impl DataConnector for QACKClient {
 
         let mut ttimevec: Vec<String> = vec![];
         if freq == "day" {
-            let timevec: Vec<_> = result.get_column("date")?.iter::<Date<Tz>>()?.collect();
+            let timevec: Vec<_> = result.get_column("date")?.iter::<NaiveDate>()?.collect();
 
             ttimevec = timevec
                 .iter()
@@ -354,7 +354,7 @@ impl DataConnector for QACKClient {
         let sqlx = format!("SELECT * FROM quantaxis.stock_adj where order_book_id in ['{}'] AND date BETWEEN '{}' AND '{}' ", codevar, start, end);
         println!("{:#?}", sqlx);
         let mut result = cursor.query(sqlx).fetch_all().await?;
-        let timevec: Vec<_> = result.get_column("date")?.iter::<Date<Tz>>()?.collect();
+        let timevec: Vec<_> = result.get_column("date")?.iter::<NaiveDate>()?.collect();
 
         let ttimevec = timevec
             .iter()
@@ -392,7 +392,7 @@ impl DataConnector for QACKClient {
             .copied()
             .collect();
         let mut ttimevec: Vec<String> = vec![];
-        let timevec: Vec<_> = result.get_column("date")?.iter::<Date<Tz>>()?.collect();
+        let timevec: Vec<_> = result.get_column("date")?.iter::<NaiveDate>()?.collect();
         ttimevec = timevec
             .iter()
             .map(|x| x.to_string()[0..10].parse().unwrap())

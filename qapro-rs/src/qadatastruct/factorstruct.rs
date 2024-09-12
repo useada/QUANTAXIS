@@ -30,7 +30,7 @@ impl QADataStruct_Factor {
         let df = DataFrame::new(vec![dateS, order_book_idS, factorS]).unwrap();
         Self {
             data: df
-                .sort(&["date", "order_book_id"], SortMultipleOptions::default().with_order_descending_multi(&[false, false]))
+                .sort(&["date", "order_book_id"], SortMultipleOptions::default().with_order_descending_multi([false, false]))
                 .unwrap(),
             name: factorname,
         }
