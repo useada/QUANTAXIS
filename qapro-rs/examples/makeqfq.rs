@@ -7,7 +7,7 @@ use qapro_rs::qaenv::localenv::CONFIG;
 
 use polars::frame::{DataFrame, UniqueKeepStrategy};
 use polars::prelude::{col, ChunkCompare, DataFrameJoinOps, IntoLazy, JoinArgs, JoinType,};
-use polars::series::ops::NullBehavior;
+// use polars::series::ops::NullBehavior;
 use qapro_rs::qadatastruct::stockadj::QADataStruct_StockAdj;
 
 extern crate stopwatch;
@@ -22,7 +22,7 @@ async fn main() {
     ///
     let c = ckclient::QACKClient::init();
 
-    let stocklist = c.get_stocklist().await.unwrap();
+    // let stocklist = c.get_stocklist().await.unwrap();
 
     let cache_file = format!("{}stockday.parquet", &CONFIG.DataPath.cache);
     let mut sw = stopwatch::Stopwatch::new();

@@ -37,7 +37,7 @@ fn QADataStruct_StockDay_schema() -> Schema {
 }
 impl QADataStruct_StockDay {
     pub fn new_from_csv(path: &str) -> Self {
-        let schema = QADataStruct_StockDay_schema();
+        // let schema = QADataStruct_StockDay_schema();
         let file = File::open(path).expect("Cannot open file.");
         let df = CsvReader::new(file)
             // .with_schema(&Arc::new(schema))
@@ -128,7 +128,7 @@ impl QADataStruct_StockDay {
     }
 
     pub fn save_cache(&mut self) {
-        let cache = &CONFIG.DataPath.cache;
+        // let cache = &CONFIG.DataPath.cache;
         let cachepath = format!("{}stockday.parquet", &CONFIG.DataPath.cache);
         let file = File::create(cachepath).expect("could not create file");
         ParquetWriter::new(file).finish(&mut self.data);

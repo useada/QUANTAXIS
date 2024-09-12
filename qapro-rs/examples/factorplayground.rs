@@ -5,7 +5,7 @@ use std::fs::File;
 use actix_rt;
 use polars::frame::DataFrame;
 use polars::prelude::*;
-use polars::series::ops::NullBehavior;
+// use polars::series::ops::NullBehavior;
 
 use itertools::izip;
 use qapro_rs::qaaccount::account::QA_Account;
@@ -35,7 +35,7 @@ async fn main() {
     println!("data  {:#?}", qfq.data.get_row(1).unwrap().0);
     // println!("data  {:#?}", qfq.data.transpose());
 
-    let cache_file = format!("{}stockadj.parquet", &CONFIG.DataPath.cache);
+    // let cache_file = format!("{}stockadj.parquet", &CONFIG.DataPath.cache);
 
     // trait qatrans {
     //     fn transform_qadatastruct(data:DataFrame) -> Vec<QAKlineBase>;
