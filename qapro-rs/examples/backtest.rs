@@ -20,7 +20,7 @@ async fn main() {
     sw.start();
     let mut qfq = QADataStruct_StockDay::new_from_parquet(cache_file.as_str());
     println!("load cache 2year fullmarket stockdata {:#?}", sw.elapsed());
-    println!("data  {:#?}", qfq.data.get_row(1).0);
+    println!("data  {:#?}", qfq.data.get_row(1).unwrap().0);
 
     // load factor
     sw.restart();
@@ -55,7 +55,7 @@ async fn main() {
             col("limit_down"),
             col("pct"),
         ])
-        .sort("date", false)
+        .sort(["date"], SortMultipleOptions::new().with_order_descending(false))
         .collect()
         .unwrap();
 

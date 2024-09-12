@@ -1,7 +1,7 @@
 use polars::prelude::{
     ChunkCompare, CsvReader, DataFrame, DataType, Field, NamedFrom, ParquetCompression,
     ParquetReader, ParquetWriter, RollingOptionsFixedWindow, Schema, SerReader, Series,
-    SortMultipleOptions,
+    SortMultipleOptions, diff
 };
 
 use polars::series::ops::NullBehavior;
@@ -157,7 +157,7 @@ mod test {
         let calc = high - low;
         println!("Final Series high - low :\n{:?}", calc);
 
-        println!("High diff:\n{}", high.diff(2, NullBehavior::Drop));
+        println!("High diff:\n{:?}", diff(high, 2, NullBehavior::Drop));
 
         println!(
             "High rollingstd:\n{}",

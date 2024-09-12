@@ -61,9 +61,8 @@ async fn main() {
             col("limit_down") * col("adj"),
         ])
         .unique(
-            Some(&["date".to_string(), "order_book_id".to_string()]),
+            Some(vec!["date".to_string(), "order_book_id".to_string()]),
             UniqueKeepStrategy::First,
-            None,
         )
         .collect()
         .unwrap();

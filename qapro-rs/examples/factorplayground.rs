@@ -32,7 +32,7 @@ async fn main() {
     sw.start();
     let mut qfq = QADataStruct_StockDay::new_from_parquet(cache_file.as_str());
     println!("load cache 2year fullmarket stockdata {:#?}", sw.elapsed());
-    println!("data  {:#?}", qfq.data.get_row(1).0);
+    println!("data  {:#?}", qfq.data.get_row(1).unwrap().0);
     // println!("data  {:#?}", qfq.data.transpose());
 
     let cache_file = format!("{}stockadj.parquet", &CONFIG.DataPath.cache);
@@ -123,7 +123,7 @@ async fn main() {
             col("limit_down"),
             col("pct"),
         ])
-        .sort("date", SortMultipleOptions::default().with_order_descending(false))
+        .sort(["date"], SortMultipleOptions::default().with_order_descending(false))
         .collect()
         .unwrap();
 

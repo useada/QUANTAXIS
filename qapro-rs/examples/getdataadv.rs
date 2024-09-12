@@ -7,7 +7,7 @@ use qapro_rs::qaenv::localenv::CONFIG;
 use qapro_rs::qalog::log4::init_log4;
 use qapro_rs::qaprotocol::mifi::qafastkline::QAKlineBase;
 
-use polars::prelude::{ChunkCompare, RollingOptionsFixedWindow, SeriesOpsTime};
+use polars::prelude::{ChunkCompare, RollingOptionsFixedWindow, SeriesOpsTime, diff};
 use polars::series::ops::NullBehavior;
 use std::fmt::format;
 
@@ -57,7 +57,7 @@ async fn main() {
 
     println!(
         "diff test {:#?}",
-        data.data["high"].diff(1, NullBehavior::Drop)
+        diff(&data.data["high"], 1, NullBehavior::Drop)
     );
 
     let selectdf = data.query_code("300002.XSHE");
