@@ -75,12 +75,12 @@ class datamodelx:
         self.table_name = self.market + '_' + self.frequence
 
         # clickhouse://[user:password]@localhost:9000/default{}
-        self.client = clickhouse_driver.Client(host='localhost', database='quantaxis',user='', password='#',
+        self.client = clickhouse_driver.Client(host='localhost', database='quantaxis',user='default', password='',
                                                settings={
                                                    'insert_block_size': 100000000},
                                                compression=True)
 
-        self.codelist = self.get_list().sort_values('listed_date', ascending=False)
+        # self.codelist = self.get_list().sort_values('listed_date', ascending=False)
         self.temp_data = []
 
     @property
@@ -605,11 +605,11 @@ class datamodelx:
                         b5_v Float32,\
                         change_rate Float32,\
                         iopv Float32,\
-                        prev_iopv\
+                        prev_iopv Float32\
                         )\
                         ENGINE = ReplacingMergeTree() \
                         PARTITION BY (toYYYYMMDD(`datetime`)) \
-                        ORDER BY (datetime, order_book_id)\
+                        ORDER BY (datetime, order_book_id) \
                         SETTINGS index_granularity=8192".format(self.table_name)
         pprint.pprint(query)
         self.client.execute(query)
